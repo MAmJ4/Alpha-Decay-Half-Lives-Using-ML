@@ -49,20 +49,20 @@ def getELDMArray():
 	return ELDM
 
 def getRangeArray (t12, rangeSize, expLow, expEnd):
-	t12range = []
-	y=expLow
-	z=1
+	t12range = [] # Initialise Array
+	y=expLow # Lowest Exponent
+	z=1 # Iterator from 1 to 9 for mantissa
 	for x in t12:
 		while (y<expEnd):
-			while (z<9.99999):
-				stepstart = float(f"{z}e{y}")
-				stepend = float(f"{z+rangeSize}e{y}")
+			while (z<9.99999): # to bypass floating point errors
+				stepstart = float(f"{z}e{y}") # lower bound is z x10^ y 
+				stepend = float(f"{z+rangeSize}e{y}") # upper bound is z+rangeSize x10^ y
 				#print(f"From {stepstart} to {stepend}")
-				if (stepstart <= x < stepend):
-					t12range.append(stepstart)
-					break
+				if (stepstart <= x < stepend): # If that particular arraay value is within this range
+					t12range.append(stepstart) # make its value the lower bound
+					break # stop the loop
 				z+=rangeSize
-			y+=1
+			y+=1 # iterate exponent
 			z=1
 		y=expLow
 		z=1
@@ -77,4 +77,3 @@ def getAdivBArray (A,B):
 		for x in range (0, len(A)):
 			AdivB.append((A[x])/(B[x]))
 		return AdivB
-
