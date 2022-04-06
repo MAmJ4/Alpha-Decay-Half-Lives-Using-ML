@@ -49,27 +49,36 @@ print("Normalised: ", normaliser(np.array(train_features[:1])).numpy())
 
 ### Multiple-Input Regression ### ###############################################
 
-# Will create a 2 layer model will the first being the normalisation layer and the second being the calculation
+# Defining how the losses will be plotted:
+def plot_loss(history):
+  plt.plot(history.history['loss'], label='loss')
+  plt.plot(history.history['val_loss'], label='val_loss')
+  plt.xlabel('Epoch')
+  plt.ylabel('Error [Half-Life]')
+  plt.legend()
+  plt.grid(True)
 
+
+# Will create a 2 step model will the first being the normalisation and the second being the calculation
 # Sequential Docs: https://www.tensorflow.org/api_docs/python/tf/keras/Sequential
+
 linear_model = tf.keras.Sequential([
-    normalizer,
+    normaliser,
     layers.Dense(units=1)
 ])
 
 # units defines dimensionality of the output space, it will be 1 dimension
-# using Sequential as it has exactly 1 input tensor and 1 output tensor
-
-linear_model.predict(train_features[:10])
+# meaning of Dense: https://keras.io/api/layers/core_layers/dense/
 
 linear_model.compile(
-    optimizer=tf.optimizers.Adam(learning_rate=0.1),
+    optimizer=tf.optimizers.Adam(learning_rate=0.05),
     loss='mean_absolute_error')
+
 
 history = linear_model.fit(
     train_features,
     train_labels,
-    epochs=100,
+    epochs=750,
     # Suppress logging.
     verbose=0,
     # Calculate validation results on 20% of the training data.
@@ -77,5 +86,9 @@ history = linear_model.fit(
 
 plot_loss(history)
 
+test_results = {}
+
 test_results['linear_model'] = linear_model.evaluate(
     test_features, test_labels, verbose=0)
+
+pd.DataFrame(test_results, index = ["Mean Absolute Error [Half-Life]"]).T
