@@ -1,1 +1,18 @@
-Normalisation Notes.txt
+----------------------------------------------------------------------------------------------
+Normalization in machine learning is the process of translating data into the range [0, 1]
+(or any other range) or simply transforming data onto the unit sphere.
+
+Some machine learning algorithms benefit from normalization and standardization, particularly
+when Euclidean distance is used. For example, if one of the variables in the K-Nearest Neighbor,
+KNN, is in the 1000s and the other is in the 0.1s, the first variable will dominate the distance
+rather strongly.
+
+(https://deepchecks.com/glossary/normalization-in-machine-learning/#:~:text=Normalization%20in%20machine%20learning%20is%20the%20process%20of%20translating%20data,when%20Euclidean%20distance%20is%20used.)
+----------------------------------------------------------------------------------------------
+It is good practice to normalize features that use different scales and ranges.
+
+One reason this is important is because the features are multiplied by the model weights.
+So, the scale of the outputs and the scale of the gradients are affected by the scale of the inputs.
+
+Although a model might converge without feature normalization, normalization makes training much more stable.
+(https://www.tensorflow.org/tutorials/keras/regression#the_normalization_layer)
