@@ -24,11 +24,11 @@ def getNArray():
 		N.append(x[2])
 	return N
 
-def getZNArray():
-	ZN = []
+def getAArray():
+	A = []
 	for x in data:
-		ZN.append(x[3])
-	return ZN
+		A.append(x[3])
+	return A
 
 def getQArray():
 	Q = []
@@ -47,6 +47,20 @@ def getELDMArray():
 	for x in data:
 		ELDM.append(x[6])
 	return ELDM
+
+def getZdistArray():
+	Zdist = []
+	for x in data:
+		dist = min([abs(x[1]-2), abs(x[1]-8), abs(x[1]-20), abs(x[1]-28), abs(x[1]-50), abs(x[1]-82), abs(x[1]-126)])
+		Zdist.append(dist)
+	return Zdist
+
+def getNdistArray():
+	Ndist = []
+	for x in data:
+		dist = min([abs(x[2]-2), abs(x[2]-8), abs(x[2]-20), abs(x[2]-28), abs(x[2]-50), abs(x[2]-82), abs(x[2]-84), abs(x[2]-126)])
+		Ndist.append(dist)
+	return Ndist
 
 def getRangeArray (t12, rangeSize, expLow, expEnd):
 	t12range = [] # Initialise Array

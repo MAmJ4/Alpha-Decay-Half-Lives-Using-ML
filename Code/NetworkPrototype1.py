@@ -88,7 +88,7 @@ print("Final Half-Life: ", result)
 
 def feedforward (Z,N,Q,structure):
 	# define matrix for 1st set of weights and initialise with random values
-	w1 = np.asarray(np.random.rand(structure[1],structure[0]))
+	w1 = np.asarray(np.random.rand(structure[1],structure[0])) # fix subtract 1 to allow negative weights
 	b1 = np.asarray(np.random.rand(structure[1],1)) # define first set of biases randomly
 
 	# min-max scale input data to get it into range [0,1]
@@ -100,13 +100,15 @@ def feedforward (Z,N,Q,structure):
 	# compute second layer activations
 	a1 = np.array([]) # declaring array
 	mult = np.array([np.matmul(w1,a0)]) # multiply weights with activations
-	mult = np.reshape(mult, (20,1)) # reshape to make 20x1 matrix
-	a1 = sigmoid(mult+b1) # add biases and plug into sigmoid
+	mult = np.reshape(mult, (20,1)) # reshape to make 20x1 matrix # fix 20 with structure[1]
+	a1 = sigmoid(mult+b1) # add biases and plug into sigmoid # fix subtract 1 to allow for neg activations
 
 	# define and randomly intialise initial weights for hidden -> final layer
 	w2 = np.asarray(np.random.rand(structure[2],structure[1]))
 	result = np.matmul(w2,a1) # calculate result and do not plug into activation function
 	print("Final Half-Life: ", result)
+
+structure = [3,50, 1]
 
 feedforward(92, 126, 8.775, structure)
 
