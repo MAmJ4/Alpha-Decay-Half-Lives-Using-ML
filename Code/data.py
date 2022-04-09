@@ -77,8 +77,3 @@ class Data ():
 		for x in self.data:
 			Isotope.append ([x[1], x[3], x[5], x[6], x[2], x[4]])
 		return Isotope
-
-
-
-d = Data()
-print(d.data[0])

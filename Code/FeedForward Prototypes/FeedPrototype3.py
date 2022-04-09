@@ -1,9 +1,10 @@
 import numpy as np
-import getData as gd
+import data 
+from data import Data as d
 
 sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
 
-structure = [6,25,30,30,25,1]
+structure = [6,16,16,16,16,1]
 
 Zdist = gd.getZdistArray()
 Ndist = gd.getNdistArray()
