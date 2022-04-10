@@ -59,45 +59,6 @@ def feedforward(data, structure):
 # remember, last weight = weights[size-2], last bias = biases [size-2]
 # do last weight linearly, do the rest with inverse sigmoid
 
-def update (activation, target , learning_rate):
-	global weights 
-	global biases 
-	global activations
-	global preactive
-	global size
-
-	dcbiases = [np.zeros(b.shape) for b in biases]
-	dcweights = [np.zeros(w.shape) for w in weights]
-
-	deltab, deltaw = backprop(activation, target)
-
-	dcbiases = [dcb + delta for dcb,delta in zip (dcbiases, deltab)]
-	dcweights = [dcw + delta for dcw,delta in zip (dcweights, deltaw)]
-
-	weights = [w-learning_rate*dcw for w, dcw in zip (weights, dcweights)]
-	biases = [b-learning_rate*dcb for b, dcb in zip (biases, dcbiases)]
-
-def backprop (activation, target):
-
-	deltab = [np.zeros(b.shape) for b in biases]
-	deltaw = [np.zeros(w.shape) for w in weights]
-
-	delta = (activation - target) * sigmoid_prime (preactive[-1])
-	# print (delta.shape)
-
-	deltab[-1] = delta
-	deltaw[-1] = np.matmul(delta, activations[-2].transpose()) 
-
-	for l in range (2, size):
-		z = preactive [-1]
-		sp = sigmoid_prime (z)
-		delta = np.dot (weights [-l+1].transpose(), delta) * sp # weights[-l+1].transpose()
-
-		deltab [-1] = delta
-		deltaw [-1] = np.dot (delta, activations [-l-1].transpose()) 
-
-	return (deltab, deltaw)
-
 def backpropagation (activation, target, learningrate):
 
 	global activations
@@ -171,8 +132,6 @@ def backpropagation (activation, target, learningrate):
 
 i = 0
 isotope = d.getIsotope()
-'''t12 = feedforward (isotope [i], structure)
-print ("Half-Life: "+ str(t12[0][0]) + "s")'''
 
 #activation = feedforward (isotope[i], structure)
 #print (activation)
