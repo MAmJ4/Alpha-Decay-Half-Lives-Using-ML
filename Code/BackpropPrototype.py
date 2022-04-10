@@ -1,96 +1,192 @@
 import numpy as np
-import data
+import data 
 from data import Data
-'''
-This will be a 3 layer structure, 3 input neurons, 20 neurons in 1 hidden layer
-and then 1 output neuron
-'''
 
-structure = [3,25, 1]
+sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
 
-gd = Data()
+sigmoid_prime = lambda z : sigmoid(z)*(1-sigmoid(z))
 
-# sigmoid ##################################################################################################
-def sigmoid(x):
-    return 1.0/(1.0+np.exp(-x))
+structure = [6,16,16,16,16,1]
 
-Qmin = min(gd.getQ())
-Qmax = max(gd.getQ())
+d = Data ()
 
-w1 = np.asarray(np.random.rand(structure[1],structure[0])) # fix subtract 1 to allow negative weights
-b1 = np.asarray(np.random.rand(structure[1],1)) # define first set of biases randomly
+global weights 
+weights = []
+global biases 
+biases = []
+global activations
+activations = []
+global preactive 
+preactive = []
+global size 
+size = len(structure)
 
-w2 = np.asarray(np.random.rand(structure[2],structure[1])) # fix subtract 1 to allow negative weights
-b2 = np.asarray(np.random.rand(structure[2],1)) # define first set of biases randomly
+for x in range (0, (size - 1)):
+	weights.append(np.asarray(np.random.rand(structure[x+1],structure[x])))
+	biases.append(np.asarray(np.random.rand(structure[x+1],1)))
 
-result = 0
+for x in range (0, size):
+	activations.append(np.zeros((structure[x],1)))
 
-def feedforward (Z,N,Q,structure):
-	# define matrix for 1st set of weights and initialise with random values
-	#w1 = np.asarray(np.random.rand(structure[1],structure[0])) # fix subtract 1 to allow negative weights
-	#b1 = np.asarray(np.random.rand(structure[1],1)) # define first set of biases randomly
+def feedforward(data, structure):
+	global activations
+	# min-max scaling
+	Z = (data[0]-min(d.getZ()))/(max(d.getZ())-min(d.getZ()))
+	N = (data[1]-min(d.getN()))/(max(d.getN())-min(d.getN()))
+	A = (data[2]-min(d.getA()))/(max(d.getA())-min(d.getA()))
+	Q = (data[3]-min(d.getQ()))/(max(d.getQ())-min(d.getQ()))
+	Zd = (data[4]-min(d.getZDist()))/(max(d.getZDist())-min(d.getZDist()))
+	Nd = (data[5]-min(d.getNDist()))/(max(d.getNDist())-min(d.getNDist()))
 
-	# min-max scale input data to get it into range [0,1]
-	Z = (Z-80)/(118-80)
-	N = (N-92)/(177-92)
-	Q = (Q-Qmin)/(Qmax-Qmin)
-	a0 = np.array([[Z],[N],[Q]]) # use scaled inputs as initial activations
+	activations [0] = np.array([[Z], [N], [A], [Q], [Zd], [Nd]]) # use scaled inputs as initial activations
 
-	# compute second layer activations
-	a1 = np.array([]) # declaring array
-	mult = np.array([np.matmul(w1,a0)]) # multiply weights with activations
-	mult = np.reshape(mult, (structure[1],1)) # reshape to make 20x1 matrix # fix 20 with structure[1]
-	a1 = sigmoid(mult+b1) # add biases and plug into sigmoid # fix subtract 1 to allow for neg activations
+	for x in range (0, size - 2):
+		a = activations [x]
+		mult = np.array([np.matmul(weights [x], a)])
+		mult = np.reshape(mult, (structure [x+1],1))
+		preactive.append (mult + biases [x])
+		activations [x+1] = sigmoid(mult + biases[x])
 
-	# define and randomly intialise initial weights for hidden -> final layer
-	#w2 = np.asarray(np.random.rand(structure[2],structure[1]))
-	result = np.matmul(w2,a1) + b2 # calculate result and do not plug into activation function
-	print("Final Half-Life: ", result)
+	af = np.array([])
+	mult = np.array([np.matmul(weights[size - 2],activations [size - 2])])
+	mult = np.reshape (mult, (structure[size - 1],1))
+	af = mult + biases[size - 2]
+	activations.append([af])
+	preactive.append ([af])
 
-#feedforward(92, 126, 8.775, structure)
+	return af
 
-learningrate = 0.01
+# remember, last weight = weights[size-2], last bias = biases [size-2]
+# do last weight linearly, do the rest with inverse sigmoid
+
+def update (activation, target , learning_rate):
+	global weights 
+	global biases 
+	global activations
+	global preactive
+	global size
+
+	dcbiases = [np.zeros(b.shape) for b in biases]
+	dcweights = [np.zeros(w.shape) for w in weights]
+
+	deltab, deltaw = backprop(activation, target)
+
+	dcbiases = [dcb + delta for dcb,delta in zip (dcbiases, deltab)]
+	dcweights = [dcw + delta for dcw,delta in zip (dcweights, deltaw)]
+
+	weights = [w-learning_rate*dcw for w, dcw in zip (weights, dcweights)]
+	biases = [b-learning_rate*dcb for b, dcb in zip (biases, dcbiases)]
+
+def backprop (activation, target):
+
+	deltab = [np.zeros(b.shape) for b in biases]
+	deltaw = [np.zeros(w.shape) for w in weights]
+
+	delta = (activation - target) * sigmoid_prime (preactive[-1])
+	# print (delta.shape)
+
+	deltab[-1] = delta
+	deltaw[-1] = np.matmul(delta, activations[-2].transpose()) 
+
+	for l in range (2, size):
+		z = preactive [-1]
+		sp = sigmoid_prime (z)
+		delta = np.dot (weights [-l+1].transpose(), delta) * sp # weights[-l+1].transpose()
+
+		deltab [-1] = delta
+		deltaw [-1] = np.dot (delta, activations [-l-1].transpose()) 
+
+	return (deltab, deltaw)
+
+def backpropagation (activation, target, learningrate):
+
+	global activations
+	global biases
+	global weights
+
+	error_l = activations [-1] - target
+	error_l = np.reshape (error_l, (1, structure[-1]))
+	deltab = []
+	deltab.insert (0, error_l)
+	deltaw = []
+	deltaw.insert (0, np.matmul(activations[-2], error_l))
+
+	# second last layer
+	#print (weights[-1].shape)
+	#print (error_l.shape)
+
+	foo = np.matmul (weights[-1].transpose(), error_l)
+	error_2l = np.multiply (foo, sigmoid_prime (preactive[-2]))
+	error_2l = np.reshape (error_2l, (1,structure[-2]))
+
+	deltab.insert (0, error_2l)
+	deltaw.insert (0, np.matmul(activations[-3], error_2l))
+
+
+	# third last layer
+	#print (weights[-2].transpose().shape)
+	#print (error_2l.shape)
+	foo = np.matmul (weights[-2].transpose(), error_2l.transpose())
+	error_3l = np.multiply (foo, sigmoid_prime (preactive[-3]))
+	error_3l = np.reshape (error_3l, (1, structure[-3]))
+	deltab.insert (0, error_3l)
+	deltaw.insert (0, np.matmul(activations[-4], error_3l))
+
+	# fourth last layer
+	foo = np.matmul (weights[-3].transpose(), error_3l.transpose())
+	error_4l = np.multiply (foo, sigmoid_prime (preactive[-4]))
+	error_4l = np.reshape (error_4l, (1,structure[-4]))
+	deltab.insert (0, error_4l)
+	deltaw.insert (0, np.matmul(activations[-5], error_4l))
+
+	# 5th last layer
+	foo = np.matmul (weights[-4].transpose(), error_4l.transpose())
+	error_5l = np.multiply (foo, sigmoid_prime (preactive[-5]))
+	error_4l = np.reshape (error_4l, (1,structure[-5]))
+	deltab.insert (0, error_5l)
+	#print (activations[-6].shape)
+	#print (error_5l.shape)
+	deltaw.insert (0, np.matmul (activations[-6].transpose(), error_5l))
+
+	'''	for w,dw in zip(weights,deltaw):
+		print (f"Original Shape: {w.shape}")
+		print (dw.shape)
+		w = w+learningrate*dw
+		print (f"New Shape: {w.shape}")
+		w = w.reshape ()'''
+
+	for x in range (0,5):
+		print(f"Original Shape: {weights[x].shape}")
+		weights[x] = weights[x] + learningrate * deltaw [x]
+		weights[x] = np.reshape (weights[x], (structure[x+1], structure[x]))
+		print(f"New Shape: {weights[x].shape}")
+
+	for b,db in zip (biases, deltab):
+		b = b+learningrate*db
+	#weights = (w + learningrate*dw for w,dw in zip (weights, deltaw))
+	#biases = (b + learningrate*db for b,db in zip (biases, deltab))
 
 
 
 
-def backprop (target):
-	outputError = target - result
-	grad = learningrate * outputError
-	hidden_T = np.transpose(w2)
-	w2 += np.matmul(hidden_T, grad)
+i = 0
+isotope = d.getIsotope()
+'''t12 = feedforward (isotope [i], structure)
+print ("Half-Life: "+ str(t12[0][0]) + "s")'''
 
-	hiddenError = np.matmul (outputError, np.transpose(w2))
-	grad = learningrate * hiddenError * sigmoid (a1) * (1-sigmoid(a1))
-	w1 += np.matmul (grad, np.transpose (a0))
+#activation = feedforward (isotope[i], structure)
+#print (activation)
+#print (activations [-1])
 
+#backpropagation (activation, np.log10 (d.getHL()[i]), 0.01)
 
-w1 = np.asarray (np.random.rand(structure[1],structure[0])) # fix subtract 1 to allow negative weights
-b1 = np.asarray (np.random.rand(structure[1],1)) # define first set of biases randomly
-
-w2 = np.asarray (np.random.rand(structure[2],structure[1])) # fix subtract 1 to allow negative weights
-b2 = np.asarray (np.random.rand(structure[2],1)) # define first set of biases randomly
-
-w2_T = np.transpose(w2)
-
-
-def train (Z,N,Q,structure,target):
-	for x in range (1000):
-		feedforward (Z,N,Q,structure)
-		backprop (target)
-	feedforward(Z,N,Q,structure)
+for z in range (0,10):
+	#activation = feedforward (isotope[i], structure)
+	backpropagation (feedforward (isotope[i], structure), np.log10 (d.getHL()[i]), 0.01)
+	print (f"{z+1} iterations done")
 
 
 
-train (92, 126, 8.775, structure, 5.1e-4)
-
-'''
-hiddenErrors = np.dot(self.outputs, np.transpose(self.weightsHiddenToOutput))
-27.	        # calculate gradients  
-28.	        gradients = (self.learningRate * hiddenErrors * sigmoid(self.hidden) * (1 -   
-29.	        sigmoid(hidden))  
-30.	        # adjust weights  
-31.	        self.weightsInputToHidden += np.dot(gradients, np.transpose(self.inputs))  
-
-'''	
-
+'''for x in range (0,10):
+	activation = feedforward (isotope [i], structure)
+	update (activation, np.log10(d.getHL()[i]), 0.01) '''

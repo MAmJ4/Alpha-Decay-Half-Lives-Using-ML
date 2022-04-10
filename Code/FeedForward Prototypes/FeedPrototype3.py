@@ -1,17 +1,17 @@
 import numpy as np
 import data 
-from data import Data as d
+from data import Data as gd
 
 sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
 
 structure = [6,16,16,16,16,1]
 
-Zdist = gd.getZdistArray()
-Ndist = gd.getNdistArray()
-ZArr = gd.getZArray()
-NArr = gd.getNArray()
-AArr = gd.getAArray()
-QArr = gd.getQArray()
+Zdist = gd.getZDist()
+Ndist = gd.getNDist()
+ZArr = gd.getZ()
+NArr = gd.getN()
+AArr = gd.getA()
+QArr = gd.getQ()
 
 weights = []
 biases = []
