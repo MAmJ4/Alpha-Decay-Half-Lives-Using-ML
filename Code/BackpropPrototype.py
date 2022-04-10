@@ -156,13 +156,13 @@ def backpropagation (activation, target, learningrate):
 		w = w.reshape ()'''
 
 	for x in range (0,5):
-		print(f"Original Shape: {weights[x].shape}")
-		weights[x] = weights[x] + learningrate * deltaw [x]
+		#print(f"Original Shape: {weights[x].shape}")
+		weights[x] = weights[x] - learningrate * deltaw [x]
 		weights[x] = np.reshape (weights[x], (structure[x+1], structure[x]))
-		print(f"New Shape: {weights[x].shape}")
+		#print(f"New Shape: {weights[x].shape}")
 
 	for b,db in zip (biases, deltab):
-		b = b+learningrate*db
+		b = b-learningrate*db
 	#weights = (w + learningrate*dw for w,dw in zip (weights, deltaw))
 	#biases = (b + learningrate*db for b,db in zip (biases, deltab))
 
@@ -177,16 +177,16 @@ print ("Half-Life: "+ str(t12[0][0]) + "s")'''
 #activation = feedforward (isotope[i], structure)
 #print (activation)
 #print (activations [-1])
-
 #backpropagation (activation, np.log10 (d.getHL()[i]), 0.01)
+
+
+error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
+print (f"Error: {error}")
 
 for z in range (0,10):
 	#activation = feedforward (isotope[i], structure)
 	backpropagation (feedforward (isotope[i], structure), np.log10 (d.getHL()[i]), 0.01)
 	print (f"{z+1} iterations done")
 
-
-
-'''for x in range (0,10):
-	activation = feedforward (isotope [i], structure)
-	update (activation, np.log10(d.getHL()[i]), 0.01) '''
+error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
+print (f"Error: {error}")
