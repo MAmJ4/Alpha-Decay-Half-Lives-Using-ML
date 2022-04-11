@@ -93,11 +93,22 @@ class Network ():
 
 	def train (self, dataset, targets, epochs):
 		for x in range (epochs):
+			print (f"Epoch {x+1}")
 			for y in range (0, len(dataset)):
 				activation = self.feedforward (dataset[y])
 				self.backpropagation (activation, targets[y]) 
 
-
+	def evaluate (self, dataset, targets):
+		predictions = []
+		errors = []
+		for isotope in dataset:
+			prediction = self.feedforward (isotope)
+			predictions.append(prediction)
+		for x in range (len(predictions)):
+			error = predictions[x] - targets[x]
+			errors.append (error**2)
+		sigma =  (np.sum(errors)**(1/2)) / len(dataset)
+		return float(sigma)
 
 
 
@@ -114,18 +125,30 @@ numTest = len(isotopes)-numTrain
 
 rng = default_rng
 
+trainingNums = np.arange(len(isotopes))
+
 randomNums = np.random.choice (len(isotopes), numTrain, replace = False) # replace: whether or not a sample is returned to the sample pool
+trainingNums = np.delete(trainingNums, randomNums)
 
 trainSet = []
 trainLabels = []
 
 for x in range (numTrain):
 	trainSet.append (isotopes[randomNums[x]])
-	trainLabels.append (halflives[randomNums[x]])
+	trainLabels.append (np.log10(halflives[randomNums[x]]))
 
-net.train(trainSet, trainLabels, 3000)
+testSet = []
+testLabels = []
 
+for x in range (numTest):
+	testSet.append (isotopes[trainingNums[x]])
+	testLabels.append (np.log10(halflives[trainingNums[x]]))
+
+
+net.train(trainSet, trainLabels, 3500)
 print ("Training Complete")
+stddev = net.evaluate(testSet, testLabels)
+print (f"Standard Deviation: {stddev}")
 
 
 
