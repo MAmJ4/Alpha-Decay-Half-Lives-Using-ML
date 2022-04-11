@@ -27,6 +27,8 @@ for x in range (0, size):
 
 def feedforward(data, structure):
 	global activations
+	global weights
+	global biases
 	# min-max scaling
 	Z = (data[0]-min(d.getZ()))/(max(d.getZ())-min(d.getZ()))
 	N = (data[1]-min(d.getN()))/(max(d.getN())-min(d.getN()))
@@ -39,6 +41,7 @@ def feedforward(data, structure):
 
 	for x in range (0, size - 2):
 		a = activations [x]
+		print (x)
 		mult = np.array([np.matmul(weights[x] , a)])
 		mult = np.reshape(mult, (structure[x+1] ,1))
 		preactive.append (mult + biases [x])
@@ -107,8 +110,8 @@ def backpropagation (activation, target, learningrate):
 i = 0
 isotope = d.getIsotope()
 
-error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
-print (f"Error: {error}")
+#error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
+#print (f"Error: {error}")
 
 for z in range (0, 2000):
 	activation = feedforward (isotope[i], structure)
