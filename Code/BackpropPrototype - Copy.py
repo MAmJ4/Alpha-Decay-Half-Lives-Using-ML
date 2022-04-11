@@ -18,14 +18,14 @@ preactive = []
 size = len(structure)
 
 for x in range (0, (size - 1)):
-	weights.append(np.asarray(np.random.uniform(-1,1, (structure[x+1],structure[x]))))
-	biases.append(np.asarray(np.random.uniform(-1,1, (structure[x+1],1))))
+	weights.append(np.asarray(np.random.rand(structure[x+1],structure[x])))
+	biases.append(np.asarray(np.random.rand(structure[x+1],1)))
 
 for x in range (0, size):
 	activations.append(np.zeros((structure[x],1)))
 
 def feedforward(data, structure):
-	global activations
+	global activation
 	# min-max scaling
 	Z = (data[0]-min(d.getZ()))/(max(d.getZ())-min(d.getZ()))
 	N = (data[1]-min(d.getN()))/(max(d.getN())-min(d.getN()))
@@ -34,14 +34,14 @@ def feedforward(data, structure):
 	Zd = (data[4]-min(d.getZDist()))/(max(d.getZDist())-min(d.getZDist()))
 	Nd = (data[5]-min(d.getNDist()))/(max(d.getNDist())-min(d.getNDist()))
 
-	activations [0] = np.array([[Z], [N], [A], [Q], [Zd], [Nd]]) # use scaled inputs as initial activations
+	activations[0] = np.array([[Z], [N], [A], [Q], [Zd], [Nd]]) # use scaled inputs as initial activations
 
 	for x in range (0, size - 2):
 		a = activations [x]
 		mult = np.array([np.matmul(weights [x], a)])
 		mult = np.reshape(mult, (structure [x+1],1))
 		preactive.append (mult + biases [x])
-		activations [x+1] = sigmoid(mult + biases[x])
+		activations[x+1] = sigmoid(mult + biases[x])
 
 	af = np.array([])
 	mult = np.array([np.matmul(weights[size - 2],activations [size - 2])])
@@ -56,7 +56,6 @@ def feedforward(data, structure):
 # do last weight linearly, do the rest with inverse sigmoid
 
 def backpropagation (activation, target, learningrate):
-
 	global activations
 	global biases
 	global weights
@@ -97,16 +96,16 @@ def backpropagation (activation, target, learningrate):
 	deltaw.insert (0, np.matmul(activations[-5], error_4l))
 
 	# 5th last layer
-	#print (weights[-4].transpose().shape)
-	#print (error_4l.transpose().shape)
 	foo = np.matmul (weights[-4].transpose(), error_4l.transpose())
-	#print (foo.shape)
 	error_5l = np.multiply (foo, sigmoid_prime (preactive[-5]))
-	print (error_5l.shape)
-	error_5l = np.reshape (error_4l, (1,structure[-5]))
-	print (error_5l.shape)
+	error_4l = np.reshape (error_4l, (1,structure[-5]))
 	deltab.insert (0, error_5l)
-	deltaw.insert (0, np.matmul (activations[1], error_5l))
+	#print(activations[-6])
+	#print (activations[-6].shape)
+	#print (error_5l.shape)
+	#print(f"Activations[-6]: {activations[-6].transpose()}\n Activations: {activations}")
+	#print(np.matmul(activations[-6].transpose(), error_5l))
+	deltaw.insert(0, np.matmul(activations[1].transpose(), error_5l))
 
 	'''	for w,dw in zip(weights,deltaw):
 		print (f"Original Shape: {w.shape}")
@@ -117,16 +116,16 @@ def backpropagation (activation, target, learningrate):
 
 	for x in range (0,5):
 		#print(f"Original Shape: {weights[x].shape}")
-		print (weights[x].shape)
-		print (deltaw[x].shape)
 		weights[x] = weights[x] - learningrate * deltaw [x]
 		weights[x] = np.reshape (weights[x], (structure[x+1], structure[x]))
 		#print(f"New Shape: {weights[x].shape}")
 
 	for b,db in zip (biases, deltab):
-		b = b - learningrate*db
+		b = b-learningrate*db
 	#weights = (w + learningrate*dw for w,dw in zip (weights, deltaw))
 	#biases = (b + learningrate*db for b,db in zip (biases, deltab))
+
+
 
 
 i = 0
@@ -141,15 +140,10 @@ isotope = d.getIsotope()
 error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
 print (f"Error: {error}")
 
-errors = []
-
-for z in range (0, 2000):
-	activation = feedforward (isotope[i], structure)
+for z in range (0,2000):
+	#activation = feedforward (isotope[i], structure
 	backpropagation (feedforward (isotope[i], structure), np.log10 (d.getHL()[i]), 0.01)
 	#print (f"{z+1} iterations done")
-	error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
-	errors.append (error)
 
-#print (errors)
-#print (f"Index of Converged Value: {errors.index (3.63632997)}")
-	
+error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
+print (f"Error: {error}")
