@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.random import default_rng
 import matplotlib.pyplot as plt
 import data
 from data import Data
@@ -9,7 +10,7 @@ sigmoid_prime = lambda z : sigmoid(z)*(1-sigmoid(z))
 
 class Network ():
 
-	def __init__ (self, structure, learningrate = 0.001):
+	def __init__ (self, structure, learningrate = 0.01):
 		d = Data ()
 		self.size = len(structure) # set size equal to number of layers
 		self.structure = structure # set structure (n of neurons) to match input
@@ -66,7 +67,7 @@ class Network ():
 
 		return af
 
-	def backpropagation (self, activation, target, learningrate):
+	def backpropagation (self, activation, target):
 		deltaBiases = []
 		deltaWeights = []
 
@@ -90,6 +91,12 @@ class Network ():
 		for x in range (0,5):
 			self.biases[x] = self.biases [x] - (learningrate * deltaBiases[x])
 
+	def train (self, dataset, targets, epochs):
+		for x in range (epochs):
+			for y in range (0, len(dataset)):
+				activation = self.feedforward (dataset[y])
+				self.backpropagation (activation, targets[y]) 
+
 
 
 
@@ -100,7 +107,34 @@ net = Network ([6,16,16,16,16,1])
 
 i = 100
 isotopes = d.getIsotope()
+halflives = d.getHL()
 
+numTrain = len(isotopes)*8//10
+numTest = len(isotopes)-numTrain
+
+rng = default_rng
+
+randomNums = np.random.choice (len(isotopes), numTrain, replace = False) # replace: whether or not a sample is returned to the sample pool
+
+trainSet = []
+trainLabels = []
+
+for x in range (numTrain):
+	trainSet.append (isotopes[randomNums[x]])
+	trainLabels.append (halflives[randomNums[x]])
+
+net.train(trainSet, trainLabels, 3000)
+
+print ("Training Complete")
+
+
+
+
+
+
+
+
+'''
 errors = []
 
 epochs = 2000
@@ -109,7 +143,7 @@ print (f"Error Before Backpropagation: {net.feedforward (isotopes[i]) - np.log10
 
 for x in range (0, epochs):
 	activation = net.feedforward (isotopes[i]) - np.log10 (d.getHL()[i])
-	net.backpropagation (activation, np.log10 (d.getHL()[i]), 0.01)
+	net.backpropagation (activation, np.log10 (d.getHL()[i]))
 	error = activation - np.log10 (d.getHL()[i])
 	errors.append(float(error))
 	if x == (epochs-1):
@@ -117,5 +151,5 @@ for x in range (0, epochs):
 		print (f"Log 10 of Predicted Half Life = {activation}")
 		print (f"Log 10 of Actual Half Life = {np.log10 (d.getHL()[i])}")
 
-
 print (f"Error After Backpropagation: {float(net.feedforward (isotopes[i])) - float(np.log10 (d.getHL()[i]))}")
+'''
