@@ -6,7 +6,7 @@ sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
 
 sigmoid_prime = lambda z : sigmoid(z)*(1-sigmoid(z))
 
-structure = [6,16,16,16,16,1]
+structure = [6,16,16,16,16,16,1]
 
 d = Data ()
 
@@ -41,9 +41,8 @@ def feedforward(data, structure):
 
 	for x in range (0, size - 2):
 		a = activations [x]
-		print (x)
-		mult = np.array([np.matmul(weights[x] , a)])
-		mult = np.reshape(mult, (structure[x+1] ,1))
+		mult = np.array([np.matmul(weights [x], a)])
+		mult = np.reshape(mult, (structure [x+1],1))
 		preactive.append (mult + biases [x])
 		activations [x+1] = sigmoid(mult + biases[x])
 
@@ -59,64 +58,93 @@ def feedforward(data, structure):
 def backpropagation (activation, target, learningrate):
 	global weights
 	global biases
-	deltab = []
+
 	deltaw = []
+	deltab = []
 
 	# error in last layer
 	error_l = activation - target # getting error
 	error_l = error_l = np.reshape (error_l, (structure[-1], 1)) # reshaping error to be array
-	deltab.insert (0, error_l)
-	deltaw.insert (0, np.matmul(error_l, activations[-2][0].transpose()))
+	deltab.insert (0, error_l) # error = delta biases
+	deltaw.insert (0, np.matmul(error_l, activations[4].transpose())) # weight delta is error propagated backwards
 
-	'''	# error in second last layer
+	# error in second last layer
 	foo = np.matmul (weights[-1].transpose(), error_l)
-	error_2l = np.multiply (foo, sigmoid_prime (preactive[-2]))
+	error_2l = np.multiply (foo, sigmoid_prime (preactive[-3]))
 	error_2l = np.reshape (error_2l, (structure[-2], 1))
 	deltab.insert (0, error_2l)
-	deltaw.insert (0, np.matmul(error_2l, activations[-3][0].transpose()))
-
+	deltaw.insert (0, np.matmul(error_2l, activations[3].transpose()))
+			
 	# error in third last layer
 	foo = np.matmul (weights[-2].transpose(), error_2l)
-	error_3l = np.reshape (error_2l, (structure[-3], 1))
+	error_3l = np.multiply (foo, sigmoid_prime (preactive[-4]))
+	error_3l = np.reshape (error_3l, (structure[-3], 1))
 	deltab.insert (0, error_3l)
-	deltaw.insert (0, np.matmul(error_3l, activations[-4][0].transpose()))
-
+	deltaw.insert (0, np.matmul(error_3l, activations[2].transpose()))
+	
 	# error in fourth last layer
 	foo = np.matmul (weights[-3].transpose(), error_3l)
-	error_4l = np.reshape (error_3l, (structure[-4], 1))
+	error_4l = np.multiply (foo, sigmoid_prime (preactive[-5]))
+	error_4l = np.reshape (error_4l, (structure[-4], 1))
 	deltab.insert (0, error_4l)
-	deltaw.insert (0, np.matmul(error_4l, activations[-5][0].transpose()))
-
+	deltaw.insert (0, np.matmul(error_4l, activations[1].transpose()))
+			
 	# error in 5th last layer
 	foo = np.matmul (weights[-4].transpose(), error_4l)
-	error_5l = np.reshape (error_4l, (structure[-5], 1))
+	error_5l = np.multiply (foo, sigmoid_prime (preactive[-6]))
+	error_5l = np.reshape (error_5l, (structure[-5], 1))
 	deltab.insert (0, error_5l)
-	deltaw.insert (0, np.matmul(error_5l, activations[-6][0].transpose()))'''
+	deltaw.insert (0, np.matmul(error_5l, activations[0].transpose()))
+	
 
-	for i in range(2, size):
-		z = preactive[-i]
-		sp = sigmoid_prime(z)
-		error_l = np.dot(weights[-i+1].transpose(), error_l) * sp
-		deltab.insert(0, error_l)
-		deltaw.insert (0 , np.dot(error_l, activations[-i-1][0].transpose()))
-
-	weights = (w + learningrate*dw for w,dw in zip (weights, deltaw))
-	biases = (b + learningrate*db for b,db in zip (biases, deltab))
-	#print(f"{l} last layer done")
+	for x in range (0,5):
+		weights [x] = weights [x] - (learningrate * deltaw[x])
+	for x in range (0,5):
+		biases[x] = biases [x] - (learningrate * deltab[x])
 
 
+def iterbackprop (activation, target, learningrate):
+	global weights
+	global biases
+
+	deltaw = []
+	deltab = []
+
+	# error in last layer
+	error_l = activation - target # getting error
+	error_l = np.reshape (error_l, (structure[-1], 1)) # reshaping error to be array
+	deltab.insert (0, error_l) # error = delta biases
+	deltaw.insert (0, np.matmul(error_l, activations[4].transpose())) # weight delta is error propagated backwards
+
+	for x in range (0, size - 2):
+		prop = np.matmul (weights[-(x+1)].transpose(), error_l)
+		error_l = np.multiply (prop, sigmoid_prime (preactive[-(x+3)]))
+		error_l = np.reshape (error_l, (structure[-(x+2)] , 1))
+		deltab.insert (0, error_l)
+		deltaw.insert (0, np.matmul(error_l, activations[((size-3)-x)].transpose()))
+
+	for x in range (0,5):
+		weights [x] = weights [x] - (learningrate * deltaw[x])
+	for x in range (0,5):
+		biases[x] = biases [x] - (learningrate * deltab[x])
+
+structure = [6, 16, 16, 16, 16, 1]
 
 
-i = 0
+
+
+
+
+
+i = 123
 isotope = d.getIsotope()
 
-#error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
-#print (f"Error: {error}")
+error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
+print (f"Error Before: {error}")
 
-for z in range (0, 2000):
+for z in range (0, 5000):
 	activation = feedforward (isotope[i], structure)
-	backpropagation (feedforward (isotope[i], structure), np.log10 (d.getHL()[i]), 0.01)
-	print (f"{z+1} iterations done")
+	backpropagation (activation, np.log10 (d.getHL()[i]), 0.01)
 
 error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
-print (f"Error: {error}")
+print (f"Error After: {error}")
