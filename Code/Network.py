@@ -57,6 +57,7 @@ class Network ():
 		manually apply last layer weights and biases to avoid sigmoid, could have
 		been implemented in for loop with if statement but would have been quite messy
 		'''
+
 		af = np.array([])
 		mult = np.array([np.matmul(self.weights[self.size - 2], self.activations [self.size - 2])])
 		mult = np.reshape (mult, (self.structure[self.size - 1],1))
@@ -68,8 +69,9 @@ class Network ():
 		return af
 
 	def backpropagation (self, activation, target):
-		deltaBiases = []
-		deltaWeights = []
+
+		deltaBiases = [] # define arrays for change in biases
+		deltaWeights = [] # define arrays for change in weights
 
 		learningrate = self.learningrate
 
@@ -80,34 +82,34 @@ class Network ():
 		deltaWeights.insert (0, np.matmul(error_l, self.activations[4].transpose())) # weight delta is error propagated backwards
 
 		for x in range (0, self.size - 2):
-			prop = np.matmul (self.weights[-(x+1)].transpose(), error_l)
-			error_l = np.multiply (prop, sigmoid_prime (self.preactive[-(x+3)]))
-			error_l = np.reshape (error_l, (self.structure[-(x+2)] , 1))
-			deltaBiases.insert (0, error_l)
-			deltaWeights.insert (0, np.matmul(error_l, self.activations[((self.size-3)-x)].transpose()))
+			prop = np.matmul (self.weights[-(x+1)].transpose(), error_l) # propagate error backwards
+			error_l = np.multiply (prop, sigmoid_prime (self.preactive[-(x+3)])) # hadamard product with preactivationss
+			error_l = np.reshape (error_l, (self.structure[-(x+2)] , 1)) # reshape because numpy is peculiar
+			deltaBiases.insert (0, error_l) # error = delta bias so add to start
+			deltaWeights.insert (0, np.matmul(error_l, self.activations[((self.size-3)-x)].transpose())) # add delta weights
 
 		for x in range (0,5):
-			self.weights [x] = self.weights [x] - (learningrate * deltaWeights[x])
+			self.weights [x] = self.weights [x] - (learningrate * deltaWeights[x]) # adjust each weight by delta weight
 		for x in range (0,5):
-			self.biases[x] = self.biases [x] - (learningrate * deltaBiases[x])
+			self.biases[x] = self.biases [x] - (learningrate * deltaBiases[x]) # adjust each bias by delta bias
 
 	def train (self, dataset, targets, epochs):
-		for x in range (epochs):
-			print (f"Epoch {x+1}")
-			for y in range (0, len(dataset)):
-				activation = self.feedforward (dataset[y])
-				self.backpropagation (activation, targets[y]) 
+		for x in range (epochs): # for the specified amount of epochs
+			#print (f"Epoch {x+1}")
+			for y in range (0, len(dataset)): # for each value in the dataset
+				activation = self.feedforward (dataset[y]) # feed it forward
+				self.backpropagation (activation, targets[y]) # backpropagate against the target
 
 	def evaluate (self, dataset, targets):
-		predictions = []
-		errors = []
+		predictions = [] # define array for predictions
+		errors = [] # define array for errors
 		for isotope in dataset:
 			prediction = self.feedforward (isotope)
-			predictions.append(prediction)
+			predictions.append(prediction) # add predictions to array of predictions
 		for x in range (len(predictions)):
-			error = predictions[x] - targets[x]
-			errors.append (error**2)
-		sigma =  (np.sum(errors)**(1/2)) / len(dataset)
+			error = predictions[x] - targets[x] # calculate errors
+			errors.append (error**2) # append error^2 to array
+		sigma =  (np.sum(errors)**(1/2)) / len(dataset) # sigma = (1/n)*(sum of (errors)^2)^(1/2)
 		return float(sigma)
 
 
@@ -144,8 +146,8 @@ for x in range (numTest):
 	testSet.append (isotopes[trainingNums[x]])
 	testLabels.append (np.log10(halflives[trainingNums[x]]))
 
-
-net.train(trainSet, trainLabels, 3500)
+print ("Training...")
+net.train(trainSet, trainLabels, 500)
 print ("Training Complete")
 stddev = net.evaluate(testSet, testLabels)
 print (f"Standard Deviation: {stddev}")

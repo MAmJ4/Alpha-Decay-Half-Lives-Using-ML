@@ -1,6 +1,9 @@
 import csv as csv
 import numpy as np
 
+import sys
+sys.path.insert(1, 'C:/Users/M M Amjad/Documents/[=] A Level/Sixth Form/CS Project/Code')
+
 class Data ():
 
 	def __init__ (self):
