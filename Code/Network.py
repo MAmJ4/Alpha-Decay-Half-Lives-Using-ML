@@ -130,7 +130,7 @@ rng = default_rng
 trainingNums = np.arange(len(isotopes))
 
 randomNums = np.random.choice (len(isotopes), numTrain, replace = False) # replace: whether or not a sample is returned to the sample pool
-trainingNums = np.delete(trainingNums, randomNums)
+testingNums = np.delete(trainingNums, randomNums)
 
 trainSet = []
 trainLabels = []
@@ -143,16 +143,27 @@ testSet = []
 testLabels = []
 
 for x in range (numTest):
-	testSet.append (isotopes[trainingNums[x]])
-	testLabels.append (np.log10(halflives[trainingNums[x]]))
+	testSet.append (isotopes[testingNums[x]])
+	testLabels.append (np.log10(halflives[testingNums[x]]))
 
 print ("Training...")
-net.train(trainSet, trainLabels, 500)
+net.train(trainSet, trainLabels, 100)
 print ("Training Complete")
 stddev = net.evaluate(testSet, testLabels)
 print (f"Standard Deviation: {stddev}")
 
 
+
+model = d.getModel()
+errors = []
+
+for x in range (numTest):
+	actual = np.log10(halflives[testingNums[x]])
+	models = np.log10(model[testingNums[x]])
+	error = models - actual
+	errors.append(error**2)
+sigma =  (np.sum(errors)**(1/2)) / (numTest)
+print (f"Statistical Model Error: {sigma}")
 
 
 
