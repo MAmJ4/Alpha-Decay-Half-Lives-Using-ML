@@ -79,7 +79,7 @@ class Network ():
 		error_l = activation - target # getting error
 		error_l = np.reshape (error_l, (self.structure[-1], 1)) # reshaping error to be array
 		deltaBiases.insert (0, error_l) # error = delta biases
-		deltaWeights.insert (0, np.matmul(error_l, self.activations[4].transpose())) # weight delta is error propagated backwards
+		deltaWeights.insert (0, np.matmul(error_l, self.activations[self.size-2].transpose())) # weight delta is error propagated backwards # WAS HARDCODED
 
 		for x in range (0, self.size - 2):
 			prop = np.matmul (self.weights[-(x+1)].transpose(), error_l) # propagate error backwards
@@ -88,9 +88,8 @@ class Network ():
 			deltaBiases.insert (0, error_l) # error = delta bias so add to start
 			deltaWeights.insert (0, np.matmul(error_l, self.activations[((self.size-3)-x)].transpose())) # add delta weights
 
-		for x in range (0,5):
+		for x in range (0,self.size-1):
 			self.weights [x] = self.weights [x] - (learningrate * deltaWeights[x]) # adjust each weight by delta weight
-		for x in range (0,5):
 			self.biases[x] = self.biases [x] - (learningrate * deltaBiases[x]) # adjust each bias by delta bias
 
 	def train (self, dataset, targets, epochs):
@@ -109,8 +108,8 @@ class Network ():
 		for x in range (len(predictions)):
 			error = predictions[x] - targets[x] # calculate errors
 			errors.append (error**2) # append error^2 to array
-		sigma =  (np.sum(errors)**(1/2)) / len(dataset) # sigma = (1/n)*(sum of (errors)^2)^(1/2)
-		return float(sigma)
+		stddev =  (np.sum(errors)**(1/2)) / len(dataset) # sigma = (1/n)*(sum of (errors)^2)^(1/2)
+		return float(stddev)
 
 
 
@@ -147,7 +146,7 @@ for x in range (numTest):
 	testLabels.append (np.log10(halflives[testingNums[x]]))
 
 print ("Training...")
-net.train(trainSet, trainLabels, 100)
+net.train(trainSet, trainLabels, 10)
 print ("Training Complete")
 stddev = net.evaluate(testSet, testLabels)
 print (f"Standard Deviation: {stddev}")

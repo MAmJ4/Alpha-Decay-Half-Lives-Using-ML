@@ -61,30 +61,38 @@ a0 = np.array([[Z],[N],[Q]])
 #print(a0)
 
 #print(a0.shape)
+## 
+
 
 
 # compute activations of second layer #################################
 a1 = np.array([])
-
 mult = np.array([np.matmul(w1,a0)])
 mult = np.reshape(mult, (20,1))
-
 presigmoid = mult + b1
-
-print(presigmoid)
-print ("------------------")
-
+#print(presigmoid)
+#print ("------------------")
 a1 = sigmoid(presigmoid)
-print(a1)
-print(a1.shape)
+#print(a1)
+
+
+
+#print(a1.shape)
+#print("---------------------------------------------------")
+
 
 # define matrix for second set of weights to 3rd layer using 2d array (which will be 1d anyway)
-print("---------------------------------------------------")
 w2 = np.asarray(np.random.rand(structure[2],structure[1]))
-print (w2)
-result = np.matmul(w2,a1)
-print(result.shape)
+b2 = np.asarray(np.random.rand(structure[2],1))
+mult = np.matmul(w2,a1)
+result = mult + b2
 print("Final Half-Life: ", result)
+
+
+
+
+
+
 
 def feedforward (Z,N,Q,structure):
 	# define matrix for 1st set of weights and initialise with random values
@@ -108,7 +116,7 @@ def feedforward (Z,N,Q,structure):
 	result = np.matmul(w2,a1) # calculate result and do not plug into activation function
 	print("Final Half-Life: ", result)
 
-structure = [3,50, 1]
+structure = [3,20, 1]
 
 feedforward(92, 126, 8.775, structure)
 
