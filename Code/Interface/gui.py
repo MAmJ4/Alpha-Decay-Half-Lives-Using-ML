@@ -4,12 +4,6 @@ import predictor as ff
 from tkinter import *
 import numpy as np
 
-data_dir = os.path.abspath (os.path.join("..","Network and Data"))
-# find directory to current file
-# go to parent directory ("..")
-# from parent, add "Network and Data" to the path
-sys.path.insert(1, data_dir) # add this path to system path
-
 class errorWindow(Toplevel):
      
     def __init__(self, master = None, message = "Error"):
@@ -72,7 +66,7 @@ def btn_clicked():
     ansWindow (window, halflife)
 
 window = Tk()
-
+window.title("α-Predictor")
 window.geometry("502x526")
 window.configure(bg = "#ffffff")
 canvas = Canvas(
