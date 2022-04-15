@@ -71,6 +71,7 @@ if stddevNetwork < stddevModel: # if net is better than model
 		print (f"Stat Model Deviation: {stddevModel}")
 
 		if stddevNetwork < stddevModel: # if net better than model 3 times
+			print ("Saving")
 			net.save() # save weights and biases
 
 
