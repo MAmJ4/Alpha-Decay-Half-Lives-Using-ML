@@ -1,15 +1,12 @@
 import numpy as np
+from numpy.random import default_rng
 import matplotlib.pyplot as plt
 import data
 from data import Data
-import joblib
 
-# miscellaneous functions
 sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
 sigmoid_prime = lambda z : sigmoid(z)*(1-sigmoid(z))
 
-# database
-d = Data()
 
 class Network ():
 
@@ -33,6 +30,8 @@ class Network ():
 			self.activations.append(np.zeros((structure[x],1)))
 
 		self.learningrate = learningrate
+
+		self.trainSet, self.trainLabels, self.testSet, self.testLabels, self.modelLabels = self.getSets ()
 
 	def feedforward (self, data):
 
@@ -91,26 +90,75 @@ class Network ():
 		for x in range (0,self.size-1):
 			self.weights [x] = self.weights [x] - (learningrate * deltaWeights[x]) # adjust each weight by delta weight
 			self.biases[x] = self.biases [x] - (learningrate * deltaBiases[x]) # adjust each bias by delta bias
+	
+	def getSets (self):
 
-	def train (self, dataset, targets, epochs):
+		isotopes = d.getIsotope() # get set of Isotopes
+		halflives = d.getHL() # get set of Half-Lives
+		model = d.getModel() # get set of (Stat) Model Predictions
+
+		numTrain = len(isotopes)*8//10 # set # of training items to be 80%
+		numTest = len(isotopes) - numTrain # # of testing items is therefore 20%
+
+		allIsotopes = np.arange(len(isotopes)) # array of numbers from 0 to len(isotopes)
+
+		trainingNums = np.random.choice (len(isotopes), size = numTrain, replace = False) # replace: whether or not a sample is returned to the sample pool
+		testingNums = np.delete(allIsotopes, trainingNums) # testingNums is all isotopes - trainingNums
+
+		trainSet = []
+		trainLabels = []
+		for x in range (numTrain):
+			trainSet.append (isotopes[trainingNums[x]])
+			trainLabels.append (np.log10(halflives[trainingNums[x]]))
+
+		testSet = []
+		testLabels = []
+		for x in range (numTest):
+			testSet.append (isotopes[testingNums[x]])
+			testLabels.append (np.log10(halflives[testingNums[x]]))
+
+		modelLabels = []
+		for x in range (numTest):
+			modelLabels.append(np.log10(model[testingNums[x]]))
+
+		return trainSet, trainLabels, testSet, testLabels, modelLabels
+
+	def train (self, epochs):
 		for x in range (epochs): # for the specified amount of epochs
-			#print (f"Epoch {x+1}")
-			for y in range (0, len(dataset)): # for each value in the dataset
-				activation = self.feedforward (dataset[y]) # feed it forward
-				self.backpropagation (activation, targets[y]) # backpropagate against the target
+			print (f"Epoch {x+1}")
+			for y in range (0, len(self.trainSet)): # for each value in the dataset
+				activation = self.feedforward (self.trainSet[y]) # feed it forward
+				self.backpropagation (activation, self.trainLabels[y]) # backpropagate against the target
 
-	def evaluate (self, dataset, targets):
+	def evaluate (self):
 		predictions = [] # define array for predictions
 		errors = [] # define array for errors
-		for isotope in dataset:
+		for isotope in self.testSet:
 			prediction = self.feedforward (isotope)
 			predictions.append(prediction) # add predictions to array of predictions
 		for x in range (len(predictions)):
-			error = predictions[x] - targets[x] # calculate errors
+			error = predictions[x] - self.testLabels[x] # calculate errors
 			errors.append (error**2) # append error^2 to array
-		stddev =  (np.sum(errors)**(1/2)) / len(dataset) # sigma = (1/n)*(sum of (errors)^2)^(1/2)
+		stddev =  (np.sum(errors)**(1/2)) / len(self.testLabels) # sigma = (1/n)*(sum of (errors)^2)^(1/2)
 		return float(stddev)
 
-	def save (self):
-		joblib.dump(self.weights, "weights")
-		joblib.dump(self.biases, "biases")
+	def compare (self):
+		errors = []
+		for x in range (len(self.modelLabels)):
+			error = self.testSet [x] - self.modelLabels[x]
+			errors.append (error**2)
+
+		modelScore = (np.sum(errors)**(1/2)) / len(self.modelLabels)
+
+		netScore = self.evaluate()
+		print (f"Model Score: {modelScore}")
+		print (f"Net Score: {netScore}")
+
+d = Data()
+net = Network ([6,16,16,16,16,1])
+
+
+print ("Training")
+net.train(100) # train for 100 epochs
+print ("Testing")
+net.compare() # compare the model to the network

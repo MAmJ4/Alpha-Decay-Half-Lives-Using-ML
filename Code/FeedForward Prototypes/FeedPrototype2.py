@@ -3,7 +3,7 @@ import getData as gd
 
 sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
 
-structure = [6,16,16,16,16,1]
+structure = [6,10,25,30,25,10,1]
 
 w01 = np.asarray(np.random.rand(structure[1],structure[0])) # define weights from layer 0 to 1
 b01 = np.asarray(np.random.rand(structure[1],1)) # define biases from layer 0 to 1
@@ -35,17 +35,17 @@ for x in range (0,(len(structure) - 1)):
 	weights.append(np.asarray(np.random.rand(structure[x+1],structure[x])))
 	biases.append(np.asarray(np.random.rand(structure[x+1],1)))
 
-weights[0], weights[1], weights[2], weights[3], weights[4] = w01, w12, w23, w34, w45
-biases[0], biases[1], biases[2], biases[3], biases[4]= b01,b12,b23,b34,b45
+#weights[0], weights[1], weights[2], weights[3], weights[4] = w01, w12, w23, w34, w45
+#biases[0], biases[1], biases[2], biases[3], biases[4]= b01,b12,b23,b34,b45
 
 for x in range (0, len(structure)):
 	activations.append(np.zeros((structure[x],1)))
 
 size = len(structure)
 
-print (len(weights))
-print (len(biases))
-print (len(activations))
+#print (len(weights))
+#print (len(biases))
+#print (len(activations))
 
 def iterfeed(Z, N, A, Q, Zd, Nd, structure):
 	# min-max scaling
@@ -68,7 +68,7 @@ def iterfeed(Z, N, A, Q, Zd, Nd, structure):
 	mult = np.array([np.matmul(weights[size - 2],activations [size - 2])])
 	mult = np.reshape (mult, (structure[size - 1],1))
 	af = mult + biases[size - 2]
-
+	activations.append ([af])
 	return af
 
 def feedforward (Z, N, A, Q, Zd, Nd, structure):
@@ -111,8 +111,10 @@ def feedforward (Z, N, A, Q, Zd, Nd, structure):
 
 
 i = 0
-t12 = feedforward (ZArr[i], NArr[i], AArr[i], QArr[i], Zdist[i], Ndist[i], structure)
+'''t12 = feedforward (ZArr[i], NArr[i], AArr[i], QArr[i], Zdist[i], Ndist[i], structure)
 print ("Half-Life V: "+ str(t12[0][0]) + "s")
+
+i=0'''
 
 t12 = iterfeed (ZArr[i], NArr[i], AArr[i], QArr[i], Zdist[i], Ndist[i], structure)
 print ("Half-Life I: "+ str(t12[0][0]) + "s")

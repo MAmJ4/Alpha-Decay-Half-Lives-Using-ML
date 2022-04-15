@@ -1,11 +1,22 @@
 import sys
-sys.path.insert(1, 'C:/Users/M M Amjad/Documents/[=] A Level/Sixth Form/CS Project/Code')
+#sys.path.insert(1, 'C:/Users/M M Amjad/Documents/[=] A Level/Sixth Form/CS Project/Code')
 
 from tkinter import *
 #import Network
 #from Network import Network
 
 #net = Network ()
+
+
+class NewWindow(Toplevel):
+     
+    def __init__(self, master = None, texts = "Error"):
+         
+        super().__init__(master = master)
+        self.title("Error")
+        self.geometry("300x50")
+        label = Label(self, text = texts)
+        label.pack()
 
 
 def btn_clicked():
@@ -15,23 +26,29 @@ def btn_clicked():
         Z = int (entry0.get())
     except ValueError:
         print ("Please enter an integer number of Protons")
+        entry0.delete (0,END)
+        NewWindow (window, "Please enter an integer number of Protons")
         return
 
     try:
         N = int (entry1.get())
     except ValueError:
         print ("Please enter an integer number of Neutrons")
+        entry1.delete(0,END)
+        NewWindow (window, "Please enter an integer number of Neutrons")
         return
 
     try:
         Q = float (entry2.get())
     except ValueError:
         print ("Please enter a number for Energy Release")
+        entry2.delete(0,END)
+        NewWindow (window, "Please enter a number for Energy Release")
         return
 
     A = Z+N
-    Zdist = min ([abs(Z-28), abs(Z-50), abs(Z-82), abs(Z-126)])
-    Ndist = min ([abs(N-28), abs(N-50), abs(N-82), abs(N-84), abs(N-126)])
+    Zdist = min ([abs(Z-2), abs(Z-8), abs(Z-20), abs(Z-28), abs(Z-50), abs(Z-82), abs(Z-126)])
+    Ndist = min ([abs(N-2), abs(N-8), abs(N-20), abs(N-28), abs(N-50), abs(N-82), abs(N-84), abs(N-126)])
     data.append(Z)
     data.append(N)
     data.append(A)

@@ -69,9 +69,9 @@ def backpropagation (activation, target, learningrate):
 	deltaw.insert (0, np.matmul(activations[-2], error_l))
 
 	# second last layer
+
 	#print (weights[-1].shape)
 	#print (error_l.shape)
-
 	foo = np.matmul (weights[-1].transpose(), error_l)
 	error_2l = np.multiply (foo, sigmoid_prime (preactive[-2]))
 	error_2l = np.reshape (error_2l, (1,structure[-2]))
@@ -125,8 +125,7 @@ def backpropagation (activation, target, learningrate):
 
 	for b,db in zip (biases, deltab):
 		b = b - learningrate*db
-	#weights = (w + learningrate*dw for w,dw in zip (weights, deltaw))
-	#biases = (b + learningrate*db for b,db in zip (biases, deltab))
+
 
 
 i = 0
@@ -141,13 +140,14 @@ isotope = d.getIsotope()
 error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
 print (f"Error: {error}")
 
-errors = []
-
-for z in range (0, 2000):
+for z in range (0, 3):
 	activation = feedforward (isotope[i], structure)
-	backpropagation (feedforward (isotope[i], structure), np.log10 (d.getHL()[i]), 0.01)
+	backpropagation (feedforward (isotope[i], structure), np.log10 (d.getHL()[i]))
 	#print (f"{z+1} iterations done")
 	error = feedforward (isotope[i], structure) - np.log10 (d.getHL()[i])
+print (error)
+
+
 	errors.append (error)
 
 #print (errors)
