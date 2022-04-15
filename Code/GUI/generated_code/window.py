@@ -2,11 +2,6 @@ import sys
 #sys.path.insert(1, 'C:/Users/M M Amjad/Documents/[=] A Level/Sixth Form/CS Project/Code')
 
 from tkinter import *
-#import Network
-#from Network import Network
-
-#net = Network ()
-
 
 class NewWindow(Toplevel):
      
