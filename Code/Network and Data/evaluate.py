@@ -1,6 +1,5 @@
 import numpy as np
-import Network
-from Network import Network
+from network import Network
 import data
 from data import Data
 
@@ -53,7 +52,7 @@ trainSet, trainLabels, testSet, testLabels, stddevModel = getSets ()
 net = Network ([6,16,20,20,16,1])
 
 print ("Training...")
-net.train(trainSet, trainLabels, epochs = 10) # train network
+net.train(trainSet, trainLabels, epochs = 500) # train network
 print ("Training Complete")
 
 print ("Round 1")

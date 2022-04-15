@@ -11,6 +11,7 @@ sigmoid_prime = lambda z : sigmoid(z)*(1-sigmoid(z))
 # database
 d = Data()
 
+# network class
 class Network ():
 
 	def __init__ (self, structure, learningrate = 0.01):

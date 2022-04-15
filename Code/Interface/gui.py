@@ -1,18 +1,33 @@
-import sys
-#sys.path.insert(1, 'C:/Users/M M Amjad/Documents/[=] A Level/Sixth Form/CS Project/Code')
-
+from pathlib import Path
+designPath = Path ("GUI Images/")
+import predictor as ff
 from tkinter import *
+import numpy as np
 
-class NewWindow(Toplevel):
+data_dir = os.path.abspath (os.path.join("..","Network and Data"))
+# find directory to current file
+# go to parent directory ("..")
+# from parent, add "Network and Data" to the path
+sys.path.insert(1, data_dir) # add this path to system path
+
+class errorWindow(Toplevel):
      
-    def __init__(self, master = None, texts = "Error"):
+    def __init__(self, master = None, message = "Error"):
          
         super().__init__(master = master)
         self.title("Error")
         self.geometry("300x50")
-        label = Label(self, text = texts)
+        label = Label(self, text = message)
         label.pack()
 
+class ansWindow (Toplevel):
+
+    def __init__ (self, master = None, answer = "Error"):
+        super().__init__(master = master)
+        self.title("Prediction")
+        self.geometry("300x50")
+        label = Label(self, text = f"Half-Life: {float(answer)}s \nBase 10 Logarithm: {float(np.log10(answer))}s")
+        label.pack()
 
 def btn_clicked():
     data = []
@@ -22,7 +37,7 @@ def btn_clicked():
     except ValueError:
         print ("Please enter an integer number of Protons")
         entry0.delete (0,END)
-        NewWindow (window, "Please enter an integer number of Protons")
+        errorWindow (window, "Please enter an integer number of Protons")
         return
 
     try:
@@ -30,7 +45,7 @@ def btn_clicked():
     except ValueError:
         print ("Please enter an integer number of Neutrons")
         entry1.delete(0,END)
-        NewWindow (window, "Please enter an integer number of Neutrons")
+        errorWindow (window, "Please enter an integer number of Neutrons")
         return
 
     try:
@@ -38,7 +53,7 @@ def btn_clicked():
     except ValueError:
         print ("Please enter a number for Energy Release")
         entry2.delete(0,END)
-        NewWindow (window, "Please enter a number for Energy Release")
+        errorWindow (window, "Please enter a number for Energy Release")
         return
 
     A = Z+N
@@ -51,9 +66,10 @@ def btn_clicked():
     data.append(Zdist)
     data.append(Ndist)
 
-    print (data)
-    #net.feedforward (data)
-
+    loghalflife = ff.feedforward (data)
+    halflife = np.float_power (10, loghalflife)
+    
+    ansWindow (window, halflife)
 
 window = Tk()
 
@@ -69,12 +85,12 @@ canvas = Canvas(
     relief = "ridge")
 canvas.place(x = 0, y = 0)
 
-background_img = PhotoImage(file = f"background.png")
+background_img = PhotoImage(file = designPath / "background.png")
 background = canvas.create_image(
     251.0, 268.0,
     image=background_img)
 
-entry0_img = PhotoImage(file = f"img_textBox0.png")
+entry0_img = PhotoImage(file = designPath / "img_textBox0.png")
 entry0_bg = canvas.create_image(
     247.0, 153.5,
     image = entry0_img)
@@ -89,7 +105,7 @@ entry0.place(
     width = 306,
     height = 57)
 
-entry1_img = PhotoImage(file = f"img_textBox1.png")
+entry1_img = PhotoImage(file = designPath / "img_textBox1.png")
 entry1_bg = canvas.create_image(
     247.0, 263.5,
     image = entry1_img)
@@ -104,7 +120,7 @@ entry1.place(
     width = 306,
     height = 57)
 
-entry2_img = PhotoImage(file = f"img_textBox2.png")
+entry2_img = PhotoImage(file = designPath / "img_textBox2.png")
 entry2_bg = canvas.create_image(
     247.0, 375.5,
     image = entry2_img)
@@ -119,7 +135,7 @@ entry2.place(
     width = 306,
     height = 57)
 
-img0 = PhotoImage(file = f"img0.png")
+img0 = PhotoImage(file = designPath / "img0.png")
 
 b0 = Button(
     image = img0,

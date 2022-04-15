@@ -1,11 +1,16 @@
 import csv as csv
 import numpy as np
 
+import sys
+import os
+data_dir = os.path.abspath (os.path.join("..","Network and Data"))
+sys.path.insert(1, data_dir) # add this path to system path
+
 class Data ():
 
 	def __init__ (self):
 		self.data = []
-		with open("Database.csv") as database:
+		with open("Network and Data/Database.csv") as database:
 			csvreader = csv.reader (database)
 			for row in csvreader:
 				self.data.append([row[0],int(row[1]),int(row[2]),int(row[3]),float(row[4]),float(row[5]),float(row[6])])
