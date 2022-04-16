@@ -3,7 +3,7 @@ import numpy as np
 
 import sys
 import os
-data_dir = os.path.abspath (os.path.join("..","Network and Data"))
+data_dir = os.path.abspath(os.path.join("..","Network and Data"))
 sys.path.insert(1, data_dir) # add this path to system path
 
 class Data ():
@@ -13,17 +13,22 @@ class Data ():
 		with open("Database.csv") as database:
 			csvreader = csv.reader (database)
 			for row in csvreader:
-				self.data.append([row[0],int(row[1]),int(row[2]),int(row[3]),float(row[4]),float(row[5]),float(row[6])])
+				self.data.append([row[0],int(row[1]),int(row[2]),int(row[3]),
+					float(row[4]),float(row[5]),float(row[6])])
 		
 		# Format: Element, Z, N, A, Q, T12, ELDM
 		for isotope in self.data:
 
-			Zdist = min([abs(isotope[1]-2), abs(isotope[1]-8), abs(isotope[1]-20), 
-				abs(isotope[1]-28), abs(isotope[1]-50), abs(isotope[1]-82), abs(isotope[1]-126)])
+			Zdist = min([abs(isotope[1]-2), abs(isotope[1]-8), 
+				abs(isotope[1]-20), abs(isotope[1]-28), 
+				abs(isotope[1]-50), abs(isotope[1]-82), 
+				abs(isotope[1]-126)])
 			isotope.insert (2, Zdist)
 
-			Ndist = min([abs(isotope[3]-2), abs(isotope[3]-8), abs(isotope[3]-20), 
-				abs(isotope[3]-28), abs(isotope[3]-50), abs(isotope[3]-82), abs(isotope[3]-84), abs(isotope[3]-126)])
+			Ndist = min([abs(isotope[3]-2), abs(isotope[3]-8), 
+				abs(isotope[3]-20), abs(isotope[3]-28), 
+				abs(isotope[3]-50), abs(isotope[3]-82), 
+				abs(isotope[3]-84), abs(isotope[3]-126)])
 			isotope.insert (4, Ndist)
 		
 		# Format: Element, Z, ZDist, N, NDist, A, Q, T12, ELDM
