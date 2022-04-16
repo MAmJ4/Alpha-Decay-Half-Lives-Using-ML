@@ -20,7 +20,8 @@ class ansWindow (Toplevel):
         super().__init__(master = master)
         self.title("Prediction")
         self.geometry("300x50")
-        label = Label(self, text = f"Half-Life: {float(answer)}s \nBase 10 Logarithm: {float(np.log10(answer))}s")
+        label = Label(self, text = 
+            f"Half-Life: {float(answer)}s \nBase 10 Logarithm: {float(np.log10(answer))}s")
         label.pack()
 
 def btn_clicked():
@@ -29,7 +30,7 @@ def btn_clicked():
     try:
         Z = int (entry0.get())
     except ValueError:
-        print ("Please enter an integer number of Protons")
+        # print ("Please enter an integer number of Protons")
         entry0.delete (0,END)
         errorWindow (window, "Please enter an integer number of Protons")
         return
@@ -37,7 +38,7 @@ def btn_clicked():
     try:
         N = int (entry1.get())
     except ValueError:
-        print ("Please enter an integer number of Neutrons")
+        # print ("Please enter an integer number of Neutrons")
         entry1.delete(0,END)
         errorWindow (window, "Please enter an integer number of Neutrons")
         return
@@ -45,14 +46,16 @@ def btn_clicked():
     try:
         Q = float (entry2.get())
     except ValueError:
-        print ("Please enter a number for Energy Release")
+        # print ("Please enter a number for Energy Release")
         entry2.delete(0,END)
         errorWindow (window, "Please enter a number for Energy Release")
         return
 
     A = Z+N
-    Zdist = min ([abs(Z-2), abs(Z-8), abs(Z-20), abs(Z-28), abs(Z-50), abs(Z-82), abs(Z-126)])
-    Ndist = min ([abs(N-2), abs(N-8), abs(N-20), abs(N-28), abs(N-50), abs(N-82), abs(N-84), abs(N-126)])
+    Zdist = min ([abs(Z-2), abs(Z-8), abs(Z-20), abs(Z-28), 
+        abs(Z-50), abs(Z-82), abs(Z-126)])
+    Ndist = min ([abs(N-2), abs(N-8), abs(N-20), abs(N-28), 
+        abs(N-50), abs(N-82), abs(N-84), abs(N-126)])
     data.append(Z)
     data.append(N)
     data.append(A)
