@@ -64,7 +64,7 @@ class Network ():
 		mult = np.reshape (mult, (self.structure[self.size - 1],1))
 		af = mult + self.biases[self.size - 2]
 
-		self.activations.append ([af])
+		self.activations[-1] = [af] # was self.activations.append([af]) 
 		self.preactive.append ([af])
 
 		return af

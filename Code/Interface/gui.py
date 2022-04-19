@@ -21,7 +21,7 @@ class ansWindow (Toplevel):
         self.title("Prediction")
         self.geometry("300x50")
         label = Label(self, text = 
-            f"Half-Life: {float(answer)}s \nBase 10 Logarithm: {float(np.log10(answer))}s")
+            f"Half-Life: {round(float(np.float_power(10, answer)), 5)}s \nBase 10 Logarithm: {round(float(answer), 5)}")
         label.pack()
 
 def btn_clicked():
@@ -64,9 +64,9 @@ def btn_clicked():
     data.append(Ndist)
 
     loghalflife = ff.feedforward (data)
-    halflife = np.float_power (10, loghalflife)
-    
-    ansWindow (window, halflife)
+    #halflife = np.float_power (10, loghalflife)
+
+    ansWindow (window, loghalflife)
 
 window = Tk()
 window.title("α-Predictor")

@@ -52,7 +52,7 @@ trainSet, trainLabels, testSet, testLabels, stddevModel = getSets ()
 net = Network ([6,16,20,20,16,1])
 
 print ("Training...")
-net.train(trainSet, trainLabels, epochs = 500) # train network
+net.train(trainSet, trainLabels, epochs = 10) # train network
 print ("Training Complete")
 
 print ("Round 1")
