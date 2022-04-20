@@ -6,7 +6,7 @@ import joblib
 
 # miscellaneous functions
 sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
-sigmoid_prime = lambda z : sigmoid(z)*(1-sigmoid(z))
+sigmoid_prime = lambda z : sigmoid(x)*(1-sigmoid(x))
 
 # database
 d = Data()
@@ -50,24 +50,23 @@ class Network ():
 
 		# iterate through hidden layers using weights and biases (except for last)
 		for x in range (0, self.size - 1):
-			a = self.activations [x]
-			mult = np.array([np.matmul(self.weights[x], a)])
+			active = self.activations [x]
+			mult = np.array([np.matmul(self.weights[x], active)])
 			mult = np.reshape(mult, (self.structure[x+1],1))
-			presig = mult + self.biases [x]
-			self.preactive.append(presig)
+			presigmoid = mult + self.biases [x]
+			self.preactive.append(presigmoid)
 			self.activations [x+1] = sigmoid(mult + self.biases[x])
 
 		#manually apply last layer weights and biases to avoid sigmoid
-
-		af = np.array([])
+		actfinal = np.array([])
 		mult = np.array([np.matmul(self.weights[self.size - 2], self.activations [self.size - 2])])
 		mult = np.reshape (mult, (self.structure[self.size - 1],1))
-		af = mult + self.biases[self.size - 2]
+		actfinal = mult + self.biases[self.size - 2]
 
-		self.activations[-1] = [af] # was self.activations.append([af]) 
-		self.preactive.append ([af])
+		self.activations[-1] = [actfinal] # was self.activations.append([af]) 
+		self.preactive.append ([actfinal])
 
-		return af
+		return actfinal
 
 	def backpropagation (self, activation, target):
 
@@ -77,17 +76,17 @@ class Network ():
 		learningrate = self.learningrate
 
 		# error in last layer
-		error_l = activation - target # getting error
-		error_l = np.reshape (error_l, (self.structure[-1], 1)) # reshaping error to be array
-		deltaBiases.insert (0, error_l) # error = delta biases
-		deltaWeights.insert (0, np.matmul(error_l, self.activations[self.size-2].transpose())) # weight delta is error propagated backwards # WAS HARDCODED
+		error = activation - target # getting error
+		error = np.reshape (error, (self.structure[-1], 1)) # reshaping error to be array
+		deltaBiases.insert (0, error) # error = delta biases
+		deltaWeights.insert (0, np.matmul(error, self.activations[self.size-2].transpose())) # weight delta is error propagated backwards # WAS HARDCODED
 
 		for x in range (0, self.size - 2):
-			prop = np.matmul (self.weights[-(x+1)].transpose(), error_l) # propagate error backwards
-			error_l = np.multiply (prop, sigmoid_prime (self.preactive[-(x+3)])) # hadamard product with preactivationss
-			error_l = np.reshape (error_l, (self.structure[-(x+2)] , 1)) # reshape because numpy is peculiar
-			deltaBiases.insert (0, error_l) # error = delta bias so add to start
-			deltaWeights.insert (0, np.matmul(error_l, self.activations[((self.size-3)-x)].transpose())) # add delta weights
+			prop = np.matmul (self.weights[-(x+1)].transpose(), error) # propagate error backwards
+			error = np.multiply (prop, sigmoid_prime (self.preactive[-(x+3)])) # hadamard product with preactivationss
+			error = np.reshape (error, (self.structure[-(x+2)] , 1)) # reshape because numpy is peculiar
+			deltaBiases.insert (0, error) # error = delta bias so add to start
+			deltaWeights.insert (0, np.matmul(error, self.activations[((self.size-3)-x)].transpose())) # add delta weights
 
 		for x in range (0,self.size-1):
 			self.weights [x] = self.weights [x] - (learningrate * deltaWeights[x]) # adjust each weight by delta weight
