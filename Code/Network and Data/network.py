@@ -6,7 +6,7 @@ import joblib
 
 # miscellaneous functions
 sigmoid = lambda x : 1.0/(1.0+np.exp(-x))
-sigmoid_prime = lambda z : sigmoid(x)*(1-sigmoid(x))
+sigmoid_prime = lambda x : sigmoid(x)*(1-sigmoid(x))
 
 # database
 d = Data()
