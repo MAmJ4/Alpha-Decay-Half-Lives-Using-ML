@@ -68,7 +68,7 @@ def getRangeArray (t12, rangeSize, expLow, expEnd):
 	z=1 # Iterator from 1 to 9 for mantissa
 	for x in t12:
 		while (y<expEnd):
-			while (z<9.99999): # to bypass floating point errors
+			while (z<9.9999999): # to bypass floating point errors
 				stepstart = float(f"{z}e{y}") # lower bound is z x10^ y 
 				stepend = float(f"{z+rangeSize}e{y}") # upper bound is z+rangeSize x10^ y
 				#print(f"From {stepstart} to {stepend}")
